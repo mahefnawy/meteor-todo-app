@@ -1,5 +1,5 @@
 import { Meteor } from 'meteor/meteor';
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import {
   Box,
   Button,
@@ -21,33 +21,60 @@ const deleteTask = ({ _id }) => Meteor.call('tasks.remove', _id);
 
 export const Tasks = ({ user }) => {
   const [hideDone, setHideDone] = useState(false);
+  const firstUpdate = useRef(true);
   const doneFilter = { done: { $ne: true } };
   const userFilter = user ? { userId: user._id } : {};
   const pendingOnlyFilter = { ...doneFilter, ...userFilter };
 
-  const { tasks, pendingCount, allCount, isLoading } = useTracker(() => {
-    const noDataAvailable = { tasks: [], pendingCount: 0, allCount: 0 };
-    if (!Meteor.user()) {
-      return noDataAvailable;
-    }
-    const handler = Meteor.subscribe('tasks');
-
-    if (!handler.ready()) {
-      return { ...noDataAvailable, isLoading: true };
-    }
-
-    const tasksData = TasksCollection.find(
-      hideDone ? pendingOnlyFilter : userFilter,
-      {
-        sort: { createdAt: -1 },
+  const { tasks, pendingCount, finshedCount, allCount, isLoading } = useTracker(
+    () => {
+      const noDataAvailable = { tasks: [], pendingCount: 0, allCount: 0 };
+      if (!Meteor.user()) {
+        return noDataAvailable;
       }
-    ).fetch();
+      const handler = Meteor.subscribe('tasks');
 
-    const pending = TasksCollection.find(pendingOnlyFilter).count();
-    const all = TasksCollection.find({}).count();
+      if (!handler.ready()) {
+        return { ...noDataAvailable, isLoading: true };
+      }
 
-    return { tasks: tasksData, pendingCount: pending, allCount: all };
-  });
+      const tasksData = TasksCollection.find(
+        hideDone ? pendingOnlyFilter : userFilter,
+        {
+          sort: { createdAt: -1 },
+        }
+      ).fetch();
+
+      const pending = TasksCollection.find(pendingOnlyFilter).count();
+      const all = TasksCollection.find({}).count();
+      const finshed = all - pending;
+      return {
+        tasks: tasksData,
+        pendingCount: pending,
+        allCount: all,
+        finshedCount: finshed,
+      };
+    }
+  );
+
+  useLayoutEffect(() => {
+    if (firstUpdate.current) {
+      firstUpdate.current = false;
+
+      // Component Didmount
+    }
+
+    // Component Will Update
+    // console.log('pendingCount', pendingCount);
+    // console.log('finshedCount', finshedCount);
+    // console.log('allCount', allCount);
+  }, [pendingCount, allCount, finshedCount]);
+
+  useEffect(
+    () =>
+      // Component Will Unmount
+      function cleanup() {}
+  );
 
   const Header = () => (
     <Stack as={Box} textAlign="center" spacing={{ base: 8 }} py={{ base: 10 }}>
