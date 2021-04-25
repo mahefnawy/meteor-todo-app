@@ -57,7 +57,7 @@ export const Tasks = ({ user }) => {
           bgGradient="linear(to-l, #675AAA, #4399E1)"
           bgClip="text"
         >
-          Simple Tasks2
+          Simple Tasks6
         </Text>
       </Heading>
     </Stack>
