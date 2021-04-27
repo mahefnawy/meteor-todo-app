@@ -101,15 +101,13 @@ export const Tasks = ({ user }) => {
       // Component Didmount
       // setPendingChange(pendingCount);
       // setCompletedChange(finshedCount);
-
-      // console.log(pendingChange)
-      // console.log(completedChange)
     }
 
     // Component Will Update
+    // console.log('allCount', allCount);
     // console.log('pendingCount', pendingCount);
     // console.log('finshedCount', finshedCount);
-    // console.log('allCount', allCount);
+
     const AllChangeArrMap = allChange;
     const pedingChangeArrMap = pendingChange;
     const completedChangeArrMap = completedChange;
@@ -128,8 +126,10 @@ export const Tasks = ({ user }) => {
       completedChangeArrMap.shift();
     }
 
-    // console.log(pedingChangeArrMap);
-    // console.log(completedChangeArrMap);
+    // console.log('AllChangeArrMap', AllChangeArrMap)
+    // console.log('pedingChangeArrMap', pedingChangeArrMap);
+    // console.log('completedChangeArrMap', completedChangeArrMap);
+
     setAllChange(AllChangeArrMap);
     setPendingChange(pedingChangeArrMap);
     setCompletedChange(completedChangeArrMap);
@@ -225,8 +225,6 @@ export const Tasks = ({ user }) => {
           xl={12}
         >
           <FlexibleRadialChart
-            // color={"#F89833"}
-            // colorType={'category'}
             colorRange={colors}
             stroke="#ffffff"
             data={pieData}
