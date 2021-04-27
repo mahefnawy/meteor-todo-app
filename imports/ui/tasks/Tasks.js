@@ -14,13 +14,15 @@ import { Task } from './Task';
 import { TasksCollection } from '../../db/TasksCollection';
 import { TaskForm } from './TaskForm';
 import { useTracker } from 'meteor/react-meteor-data';
-
-const markAsDone = ({ _id, done }) => Meteor.call('tasks.setDone', _id, !done);
-
-const deleteTask = ({ _id }) => Meteor.call('tasks.remove', _id);
+import { Statistic, Row, Col } from 'antd';
+import { ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
+import './Tasks.css';
 
 export const Tasks = ({ user }) => {
   const [hideDone, setHideDone] = useState(false);
+  // Track if pending or completed increased or decreased [old value : number, new value : number]
+  const [pendingChange, setPendingChange] = useState([]);
+  const [completedChange, setCompletedChange] = useState([]);
   const firstUpdate = useRef(true);
   const doneFilter = { done: { $ne: true } };
   const userFilter = user ? { userId: user._id } : {};
@@ -62,19 +64,48 @@ export const Tasks = ({ user }) => {
       firstUpdate.current = false;
 
       // Component Didmount
+      // setPendingChange(pendingCount);
+      // setCompletedChange(finshedCount);
+
+      // console.log(pendingChange)
+      // console.log(completedChange)
     }
 
     // Component Will Update
     // console.log('pendingCount', pendingCount);
     // console.log('finshedCount', finshedCount);
     // console.log('allCount', allCount);
-  }, [pendingCount, allCount, finshedCount]);
+
+    const pedingChangeArrMap = pendingChange;
+    const completedChangeArrMap = completedChange;
+
+    pedingChangeArrMap.push(pendingCount);
+    completedChangeArrMap.push(finshedCount);
+
+    if (pedingChangeArrMap.length > 2) {
+      pedingChangeArrMap.shift();
+    }
+    if (completedChangeArrMap.length > 2) {
+      completedChangeArrMap.shift();
+    }
+
+    // console.log(pedingChangeArrMap);
+    // console.log(completedChangeArrMap);
+
+    setPendingChange(pedingChangeArrMap);
+    setCompletedChange(completedChangeArrMap);
+  }, [pendingCount, finshedCount]);
 
   useEffect(
     () =>
       // Component Will Unmount
       function cleanup() {}
   );
+
+  const markAsDone = ({ _id, done }) =>
+    Meteor.call('tasks.setDone', _id, !done);
+
+  const deleteTask = ({ _id }) => Meteor.call('tasks.remove', _id);
 
   const Header = () => (
     <Stack as={Box} textAlign="center" spacing={{ base: 8 }} py={{ base: 10 }}>
@@ -111,6 +142,50 @@ export const Tasks = ({ user }) => {
   return (
     <>
       <Header />
+      <div className="site-statistic-demo-card">
+        <Row>
+          <Col xs={12} sm={12} md={12} lg={12} xl={12}>
+            <Statistic
+              title="Pending"
+              value={pendingCount}
+              precision={2}
+              valueStyle={
+                pendingChange[1] > pendingChange[0]
+                  ? { color: '#3f8600' }
+                  : { color: '#cf1322' }
+              }
+              prefix={
+                pendingChange[1] > pendingChange[0] ? (
+                  <ArrowUpOutlined />
+                ) : (
+                  <ArrowDownOutlined />
+                )
+              }
+              suffix=""
+            />
+          </Col>
+          <Col xs={12} sm={12} md={12} lg={12} xl={12}>
+            <Statistic
+              title="Completed"
+              value={finshedCount}
+              precision={2}
+              valueStyle={
+                pendingChange[1] < pendingChange[0]
+                  ? { color: '#3f8600' }
+                  : { color: '#cf1322' }
+              }
+              prefix={
+                pendingChange[1] < pendingChange[0] ? (
+                  <ArrowUpOutlined />
+                ) : (
+                  <ArrowDownOutlined />
+                )
+              }
+              suffix=""
+            />
+          </Col>
+        </Row>
+      </div>
       <TaskForm />
       {isLoading ? (
         <Spinner />
