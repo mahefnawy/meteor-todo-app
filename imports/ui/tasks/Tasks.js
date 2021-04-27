@@ -20,6 +20,7 @@ import {
   ArrowDownOutlined,
   ClockCircleOutlined,
   CheckCircleOutlined,
+  InfoCircleOutlined,
 } from '@ant-design/icons';
 import {
   XYPlot,
@@ -35,7 +36,8 @@ import './Tasks.css';
 
 export const Tasks = ({ user }) => {
   const [hideDone, setHideDone] = useState(false);
-  // Track if pending or completed increased or decreased [old value : number, new value : number]
+  // Track if all, pending or completed increased or decreased [old value : number, new value : number]
+  const [allChange, setAllChange] = useState([]);
   const [pendingChange, setPendingChange] = useState([]);
   const [completedChange, setCompletedChange] = useState([]);
   const firstUpdate = useRef(true);
@@ -108,13 +110,17 @@ export const Tasks = ({ user }) => {
     // console.log('pendingCount', pendingCount);
     // console.log('finshedCount', finshedCount);
     // console.log('allCount', allCount);
-
+    const AllChangeArrMap = allChange;
     const pedingChangeArrMap = pendingChange;
     const completedChangeArrMap = completedChange;
 
+    AllChangeArrMap.push(allCount);
     pedingChangeArrMap.push(pendingCount);
     completedChangeArrMap.push(finshedCount);
 
+    if (AllChangeArrMap.length > 2) {
+      AllChangeArrMap.shift();
+    }
     if (pedingChangeArrMap.length > 2) {
       pedingChangeArrMap.shift();
     }
@@ -124,10 +130,10 @@ export const Tasks = ({ user }) => {
 
     // console.log(pedingChangeArrMap);
     // console.log(completedChangeArrMap);
-
+    setAllChange(AllChangeArrMap);
     setPendingChange(pedingChangeArrMap);
     setCompletedChange(completedChangeArrMap);
-  }, [pendingCount, finshedCount]);
+  }, [pendingCount, finshedCount, allCount]);
 
   useEffect(
     () =>
@@ -231,6 +237,34 @@ export const Tasks = ({ user }) => {
       </Row>
       <div className="site-statistic-demo-card graph__container mt10px">
         <Row className="mt10px">
+          <Col
+            xs={12}
+            sm={12}
+            md={12}
+            lg={12}
+            xl={12}
+            className="widget-wrapper text-align-center"
+          >
+            <InfoCircleOutlined />
+            <Statistic
+              title="All"
+              value={allCount}
+              precision={2}
+              valueStyle={
+                allChange[1] > allChange[0]
+                  ? { color: '#3f8600' }
+                  : { color: '#cf1322' }
+              }
+              prefix={
+                allChange[1] > allChange[0] ? (
+                  <ArrowUpOutlined />
+                ) : (
+                  <ArrowDownOutlined />
+                )
+              }
+              suffix=""
+            />
+          </Col>
           <Col
             xs={12}
             sm={12}
