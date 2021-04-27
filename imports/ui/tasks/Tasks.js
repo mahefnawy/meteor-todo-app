@@ -15,7 +15,12 @@ import { TasksCollection } from '../../db/TasksCollection';
 import { TaskForm } from './TaskForm';
 import { useTracker } from 'meteor/react-meteor-data';
 import { Statistic, Row, Col } from 'antd';
-import { ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
+import {
+  ArrowUpOutlined,
+  ArrowDownOutlined,
+  ClockCircleOutlined,
+  CheckCircleOutlined,
+} from '@ant-design/icons';
 import {
   XYPlot,
   XAxis,
@@ -172,7 +177,7 @@ export const Tasks = ({ user }) => {
       <Header />
       <Row>
         <Col
-          className="graph__container"
+          className="graph__container mt10px"
           xs={24}
           sm={24}
           md={12}
@@ -206,7 +211,7 @@ export const Tasks = ({ user }) => {
           <br />
         </Col>
         <Col
-          className="graph__container"
+          className="graph__container mt10px"
           xs={24}
           sm={24}
           md={12}
@@ -224,9 +229,17 @@ export const Tasks = ({ user }) => {
           />
         </Col>
       </Row>
-      <div className="site-statistic-demo-card">
-        <Row>
-          <Col xs={12} sm={12} md={12} lg={12} xl={12}>
+      <div className="site-statistic-demo-card graph__container mt10px">
+        <Row className="mt10px">
+          <Col
+            xs={12}
+            sm={12}
+            md={12}
+            lg={12}
+            xl={12}
+            className="widget-wrapper text-align-center"
+          >
+            <ClockCircleOutlined />
             <Statistic
               title="Pending"
               value={pendingCount}
@@ -246,7 +259,15 @@ export const Tasks = ({ user }) => {
               suffix=""
             />
           </Col>
-          <Col xs={12} sm={12} md={12} lg={12} xl={12}>
+          <Col
+            xs={12}
+            sm={12}
+            md={12}
+            lg={12}
+            xl={12}
+            className="widget-wrapper text-align-center"
+          >
+            <CheckCircleOutlined />
             <Statistic
               title="Completed"
               value={finshedCount}
