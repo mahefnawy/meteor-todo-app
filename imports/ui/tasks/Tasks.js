@@ -16,6 +16,16 @@ import { TaskForm } from './TaskForm';
 import { useTracker } from 'meteor/react-meteor-data';
 import { Statistic, Row, Col } from 'antd';
 import { ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
+import {
+  XYPlot,
+  XAxis,
+  YAxis,
+  VerticalGridLines,
+  HorizontalGridLines,
+  VerticalBarSeries,
+  makeWidthFlexible,
+  RadialChart,
+} from 'react-vis';
 import './Tasks.css';
 
 export const Tasks = ({ user }) => {
@@ -58,6 +68,24 @@ export const Tasks = ({ user }) => {
       };
     }
   );
+  // Graphs
+  const FlexibleXYPlot = makeWidthFlexible(XYPlot);
+  const FlexibleRadialChart = makeWidthFlexible(RadialChart);
+  const pieData = [
+    {
+      angle: pendingCount,
+      radius: 30,
+      label: 'Pending',
+      subLabel: pendingCount,
+    },
+    {
+      angle: finshedCount,
+      radius: 30,
+      label: 'Completed',
+      subLabel: finshedCount,
+    },
+  ];
+  const colors = ['#BA1200', '#4E5AC0', '#1EE19C'];
 
   useLayoutEffect(() => {
     if (firstUpdate.current) {
@@ -142,6 +170,60 @@ export const Tasks = ({ user }) => {
   return (
     <>
       <Header />
+      <Row>
+        <Col
+          className="graph__container"
+          xs={24}
+          sm={24}
+          md={12}
+          lg={12}
+          xl={12}
+        >
+          <span className="dot-pending" />
+          <span className="pending-title">Pending - </span>
+          <span className="dot-completed" />
+          <span className="completed-title">Completed - </span>
+          <span className="dot-all" />
+          <span className="all-title">All - </span>
+          <FlexibleXYPlot margin={{ bottom: 70 }} xType="ordinal" height={350}>
+            <VerticalGridLines />
+            <HorizontalGridLines />
+            <XAxis tickLabelAngle={0} />
+            <YAxis />
+            <VerticalBarSeries
+              color="#4E5AC0"
+              data={[{ x: 'Pending', y: pendingCount }]}
+            />
+            <VerticalBarSeries
+              color="#1EE19C"
+              data={[{ x: 'Completed', y: finshedCount }]}
+            />
+            <VerticalBarSeries
+              color="#BA1200"
+              data={[{ x: 'All', y: allCount }]}
+            />
+          </FlexibleXYPlot>
+          <br />
+        </Col>
+        <Col
+          className="graph__container"
+          xs={24}
+          sm={24}
+          md={12}
+          lg={12}
+          xl={12}
+        >
+          <FlexibleRadialChart
+            // color={"#F89833"}
+            // colorType={'category'}
+            colorRange={colors}
+            stroke="#ffffff"
+            data={pieData}
+            height={350}
+            showLabels
+          />
+        </Col>
+      </Row>
       <div className="site-statistic-demo-card">
         <Row>
           <Col xs={12} sm={12} md={12} lg={12} xl={12}>
